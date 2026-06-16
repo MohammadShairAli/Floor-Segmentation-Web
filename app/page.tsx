@@ -1,45 +1,27 @@
 "use client";
 
-import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from "react";
-import {
-  CheckCircle2,
-  Download,
-  ImagePlus,
-  Loader2,
-  RefreshCw,
-  Sparkles,
-  UploadCloud,
-} from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Sparkles, Layers, Heart, Loader2 } from "lucide-react";
+import Header from "../components/Header";
+import UploadPanel from "../components/UploadPanel";
+import StoneSelector from "../components/StoneSelector";
+import ResultPanel from "../components/ResultPanel";
 
-type Stone = {
-  id: string;
-  name: string;
-  scale: number;
-  url: string;
-};
-
-type ApplyResponse = {
-  result_url: string;
-  mask_url: string;
-  stone: Stone;
-};
-
-const API_BASE =
-  process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000";
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000";
 
 export default function Home() {
-  const [stones, setStones] = useState<Stone[]>([]);
+  const [stones, setStones] = useState([]);
   const [selectedStone, setSelectedStone] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState("");
-  const [result, setResult] = useState<ApplyResponse | null>(null);
+  const [result, setResult] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [loadingStones, setLoadingStones] = useState(true);
   const [error, setError] = useState("");
 
   const activeStone = useMemo(
-    () => stones.find((stone) => stone.id === selectedStone),
-    [selectedStone, stones],
+    () => stones.find((s: any) => s.id === selectedStone),
+    [stones, selectedStone]
   );
 
   useEffect(() => {
@@ -48,270 +30,145 @@ export default function Home() {
 
   async function loadStones() {
     setLoadingStones(true);
-    setError("");
-
     try {
-      const response = await fetch(`${API_BASE}/api/stones/`);
-      if (!response.ok) throw new Error("Could not load stone designs.");
-      const data = await response.json();
-      const nextStones = data.stones ?? [];
-      setStones(nextStones);
-      setSelectedStone((current) => current || nextStones[0]?.id || "");
-    } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "Could not load stones.");
+      const res = await fetch(`${API_BASE}/api/stones/`);
+      const data = await res.json();
+      setStones(data.stones || []);
+      setSelectedStone(data.stones?.[0]?.id || "");
+    } catch (err) {
+      console.error("Failed to load stones from backend api:", err);
+      setError("Unable to connect to the floor studio database.");
     } finally {
       setLoadingStones(false);
     }
   }
 
-  function handleImageChange(event: ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0] ?? null;
-    setImageFile(file);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+
+    if (!imageFile || !selectedStone) return;
+
+    setLoading(true);
     setResult(null);
     setError("");
 
-    if (!file) {
-      setImagePreview("");
-      return;
-    }
-
-    setImagePreview(URL.createObjectURL(file));
-  }
-
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    if (!imageFile || !selectedStone) {
-      setError("Choose a room image and a stone design first.");
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append("image", imageFile);
-    formData.append("stone_id", selectedStone);
-
-    setLoading(true);
-    setError("");
-
     try {
-      const response = await fetch(`${API_BASE}/api/apply/`, {
+      const form = new FormData();
+      form.append("image", imageFile);
+      form.append("stone_id", selectedStone);
+
+      const res = await fetch(`${API_BASE}/api/apply/`, {
         method: "POST",
-        body: formData,
+        body: form,
       });
-      const contentType = response.headers.get("content-type") ?? "";
-      const data = contentType.includes("application/json")
-        ? await response.json()
-        : { detail: await response.text() };
-      if (!response.ok) throw new Error(data.detail ?? "Could not apply design.");
+
+      if (!res.ok) {
+        throw new Error("Failed to process the design mask.");
+      }
+
+      const data = await res.json();
       setResult(data);
-    } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "Could not apply design.");
+    } catch (err: any) {
+      console.error(err);
+      setError("An error occurred while rendering the floor. Please try again.");
     } finally {
       setLoading(false);
     }
   }
 
-  async function handleDownload() {
-    if (!result?.result_url) return;
-
-    const response = await fetch(result.result_url);
-    const blob = await response.blob();
-    const objectUrl = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = objectUrl;
-    link.download = `floor-design-${Date.now()}.jpg`;
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    URL.revokeObjectURL(objectUrl);
-  }
-
   return (
-    <main className="min-h-screen bg-[#f5f8fb] text-ink">
-      <header className="border-b border-slate-200 bg-white/92 backdrop-blur">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4">
-          <div className="flex items-center gap-3">
-            <div className="grid h-10 w-10 place-items-center rounded bg-ink text-sky">
-              <Sparkles className="h-5 w-5" />
-            </div>
-            <div>
-              <h1 className="text-xl font-semibold tracking-normal">Floor Studio</h1>
-              <p className="text-sm text-slate-500">Professional stone floor visualization</p>
-            </div>
+    <div className="flex h-screen w-screen flex-col overflow-hidden bg-slate-100 text-slate-700">
+      
+      {/* TOP COMPONENT HEADER BAR */}
+      <Header
+        resultUrl={result?.result_url}
+        activeStoneName={activeStone?.["name"]}
+        onRefresh={loadStones}
+      />
+
+      {/* VIEWPORT FILLING GRID LAYOUT */}
+      <div className="flex flex-1 overflow-hidden">
+        
+        {/* LEFT CONTROL SIDEBAR PANEL */}
+        <aside className="w-[380px] h-full shrink-0 flex flex-col border-r border-slate-200 bg-white shadow-xs z-10">
+          
+          {/* Sidebar controls title */}
+          <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+            <h2 className="text-xs font-bold text-slate-500 uppercase tracking-widest">
+              Design Controls
+            </h2>
           </div>
 
-          <button
-            type="button"
-            onClick={loadStones}
-            className="inline-flex h-10 items-center gap-2 rounded border border-slate-200 bg-white px-3 text-sm text-ink shadow-sm transition hover:border-sky hover:text-sky"
-            title="Refresh stones"
+          {/* Form Scrollable Area */}
+          <form
+            onSubmit={handleSubmit}
+            className="flex-1 flex flex-col overflow-hidden p-5 space-y-5"
           >
-            <RefreshCw className="h-4 w-4" />
-            Refresh
-          </button>
-        </div>
-      </header>
+            <div className="flex-1 overflow-y-auto space-y-5 pr-1">
+              
+              {/* Error messages if any */}
+              {error && (
+                <div className="rounded-xl bg-red-50 border border-red-100 p-3 text-xs text-red-600 font-medium animate-shake">
+                  {error}
+                </div>
+              )}
 
-      <form onSubmit={handleSubmit} className="mx-auto grid max-w-7xl gap-5 px-5 py-6 lg:grid-cols-[360px_1fr]">
-        <aside className="space-y-5">
-          <section className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
-            <div className="mb-3 flex items-center justify-between">
-              <h2 className="text-base font-semibold">Room Image</h2>
-              <ImagePlus className="h-5 w-5 text-[#5da7dc]" />
+              {/* ROOM UPLOADER */}
+              <UploadPanel
+                setImageFile={setImageFile}
+                setImagePreview={setImagePreview}
+                imagePreview={imagePreview}
+                imageFile={imageFile}
+              />
+
+              {/* PRODUCT SELECTOR */}
+              <StoneSelector
+                stones={stones}
+                loading={loadingStones}
+                selectedStone={selectedStone}
+                setSelectedStone={setSelectedStone}
+              />
             </div>
 
-            <label className="flex min-h-40 cursor-pointer flex-col items-center justify-center rounded-lg border border-dashed border-[#8ABFE7] bg-[#8ABFE7]/10 px-4 text-center transition hover:bg-[#8ABFE7]/18">
-              <UploadCloud className="mb-3 h-8 w-8 text-[#4b9ed8]" />
-              <span className="text-sm font-medium">Upload floor image</span>
-              <span className="mt-1 text-xs text-slate-500">JPG, PNG, or WEBP</span>
-              <input className="sr-only" type="file" accept="image/*" onChange={handleImageChange} />
-            </label>
-
-            {imageFile ? (
-              <p className="mt-3 truncate text-sm text-slate-600">{imageFile.name}</p>
-            ) : null}
-          </section>
-
-          <section className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
-            <div className="mb-3 flex items-center justify-between">
-              <h2 className="text-base font-semibold">Stone Design</h2>
-              <span className="text-xs text-[#4b9ed8]">{stones.length} loaded</span>
+            {/* APPLY DESIGN CTA BUTTON */}
+            <div className="pt-4 border-t border-slate-100">
+              <button
+                type="submit"
+                disabled={loading || !imageFile || !selectedStone}
+                className={`flex h-12 w-full items-center justify-center gap-2 rounded-xl font-bold text-white bg-blue-600 shadow-md transition duration-300 ${
+                  loading
+                    ? "bg-slate-700 cursor-wait opacity-80"
+                    : !imageFile || !selectedStone
+                    ? "bg-slate-300 text-slate-500 shadow-none cursor-not-allowed"
+                    : "bg-gradient-to-r from-sky-500 to-sky-600 hover:from-sky-600 hover:to-sky-700 hover:shadow-lg active:scale-98"
+                }`}
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                    <span>Rendering...</span>
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="h-5 w-5" />
+                    <span>Apply Design</span>
+                  </>
+                )}
+              </button>
             </div>
-
-            {loadingStones ? (
-              <div className="flex h-32 items-center justify-center text-slate-500">
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Loading designs
-              </div>
-            ) : (
-              <div className="grid max-h-[430px] grid-cols-2 gap-3 overflow-y-auto pr-1">
-                {stones.map((stone) => (
-                  <button
-                    key={stone.id}
-                    type="button"
-                    onClick={() => setSelectedStone(stone.id)}
-                    className={`group overflow-hidden rounded-lg border text-left transition ${
-                      selectedStone === stone.id
-                        ? "border-[#8ABFE7] bg-[#8ABFE7]/12 shadow-sm"
-                        : "border-slate-200 bg-white hover:border-[#8ABFE7]"
-                    }`}
-                  >
-                    <div className="relative aspect-square bg-slate-100">
-                      <img src={stone.url} alt={stone.name} className="h-full w-full object-cover" />
-                      {selectedStone === stone.id ? (
-                        <CheckCircle2 className="absolute right-2 top-2 h-5 w-5 rounded-full bg-ink text-sky" />
-                      ) : null}
-                    </div>
-                    <div className="p-2">
-                      <p className="truncate text-xs font-medium text-ink">{stone.name}</p>
-                      <p className="mt-1 text-[11px] text-slate-500">Scale {stone.scale}</p>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            )}
-          </section>
-
-          {error ? (
-            <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-              {error}
-            </div>
-          ) : null}
-
-          <button
-            type="submit"
-            disabled={loading || !imageFile || !selectedStone}
-            className="inline-flex h-12 w-full items-center justify-center gap-2 rounded bg-[#8ABFE7] px-4 font-semibold text-ink shadow-sm transition hover:bg-[#a2d4f2] disabled:cursor-not-allowed disabled:opacity-45"
-          >
-            {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Sparkles className="h-5 w-5" />}
-            Apply Design
-          </button>
+          </form>
         </aside>
 
-        <section className="min-h-[720px] rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
-          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <h2 className="text-lg font-semibold">Result Preview</h2>
-              <p className="text-sm text-slate-500">
-                {result
-                  ? `Applied: ${result.stone.name}`
-                  : activeStone
-                    ? `Ready with ${activeStone.name}`
-                    : "Upload an image and select a stone"}
-              </p>
-            </div>
-            {result ? (
-              <div className="flex items-center gap-2">
-                <a
-                  href={result.result_url}
-                  target="_blank"
-                  className="rounded border border-[#8ABFE7] bg-[#8ABFE7]/12 px-3 py-2 text-sm font-medium text-ink transition hover:bg-[#8ABFE7]/22"
-                >
-                  Open Result
-                </a>
-                <button
-                  type="button"
-                  onClick={handleDownload}
-                  className="inline-flex items-center gap-2 rounded bg-ink px-3 py-2 text-sm font-medium text-white transition hover:bg-[#2f3a42]"
-                >
-                  <Download className="h-4 w-4 text-sky" />
-                  Download
-                </button>
-              </div>
-            ) : null}
-          </div>
-
+        {/* RIGHT VISUAL WORKSPACE AREA */}
+        <main className="flex-1 h-full bg-slate-900/10 p-6 overflow-hidden flex flex-col justify-center items-center">
           <ResultPanel
-            image={result?.result_url ?? imagePreview}
-            hasResult={Boolean(result)}
+            result={result}
             loading={loading}
-            emptyText="Upload a room image, select a stone, and apply the design"
+            preview={imagePreview}
+            activeStone={activeStone}
           />
-        </section>
-      </form>
-    </main>
-  );
-}
-
-function ResultPanel({
-  image,
-  hasResult,
-  loading,
-  emptyText,
-}: {
-  image: string;
-  hasResult: boolean;
-  loading: boolean;
-  emptyText: string;
-}) {
-  return (
-    <div className="rounded-lg border border-slate-200 bg-[#f8fbfd] p-3">
-      <div className="relative grid min-h-[620px] place-items-center overflow-hidden rounded bg-white">
-        {image ? (
-          <img src={image} alt="Floor design result" className="h-auto max-h-[820px] w-full object-contain" />
-        ) : (
-          <span className="px-4 text-center text-sm text-slate-400">{emptyText}</span>
-        )}
-
-        {loading ? (
-          <div className="absolute inset-0 grid place-items-center bg-white/72 backdrop-blur-sm">
-            <div className="inline-flex items-center gap-3 rounded bg-ink px-4 py-3 text-sm font-medium text-white shadow-panel">
-              <Loader2 className="h-5 w-5 animate-spin text-sky" />
-              Processing floor design
-            </div>
-          </div>
-        ) : null}
-
-        {image && !hasResult && !loading ? (
-          <div className="absolute bottom-4 left-4 rounded bg-white/90 px-3 py-2 text-sm text-slate-600 shadow-sm">
-            Preview image loaded
-          </div>
-        ) : null}
-
-        {hasResult ? (
-          <div className="absolute bottom-4 left-4 rounded bg-ink px-3 py-2 text-sm font-medium text-white shadow-sm">
-            Final result
-          </div>
-        ) : null}
+        </main>
       </div>
     </div>
   );
