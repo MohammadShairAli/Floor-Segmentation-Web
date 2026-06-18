@@ -1,4 +1,4 @@
-// File: C:\Users\User\Desktop\new\frontend\app\page.tsx
+// File: D:\shair_ali\Naveed\New folder\Floor-Segmentation-Web\app\page.tsx
 import * as entry from '../../../app/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 
