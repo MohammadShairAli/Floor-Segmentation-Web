@@ -56,41 +56,43 @@ export default function Header({ resultUrl, activeStoneName }: HeaderProps) {
   };
 
   return (
-    <header className="glass-header sticky top-0 z-50 h-16 w-full border-b border-slate-200/60">
-      <div className="flex h-full items-center justify-between px-6">
+    <header className="glass-header sticky top-0 z-50 w-screen max-w-full overflow-hidden border-b border-slate-200/60">
+      <div className="flex min-h-14 w-full max-w-[100vw] items-center gap-2 px-3 py-2 sm:gap-3 sm:px-4 lg:min-h-16 lg:px-6">
         
         {/* Left: Floor Studio Branding Logo */}
-        <div className="flex items-center gap-3">
-          <div className="grid h-10 w-10 place-items-center rounded-xl bg-slate-900 text-white shadow-md">
-            <Sparkles className="h-5 w-5 text-sky-300" />
+        <div className="flex min-w-0 items-center gap-2.5 sm:gap-3">
+          <div className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-slate-900 text-white shadow-md sm:h-10 sm:w-10 sm:rounded-xl">
+            <Sparkles className="h-4 w-4 text-sky-300 sm:h-5 sm:w-5" />
           </div>
-          <div>
-            <h1 className="text-sm font-bold tracking-wider text-slate-900 uppercase">
+          <div className="min-w-0">
+            <h1 className="truncate text-xs font-bold tracking-wider text-slate-900 uppercase sm:text-sm">
               Floor Studio
             </h1>
-            <p className="text-[10px] font-semibold text-slate-500">
+            <p className="hidden text-[10px] font-semibold text-slate-500 sm:block">
               Stone floor visualization engine
             </p>
           </div>
         </div>
 
         {/* Right Actions: Share, Download, Exit */}
-        <div className="flex items-center gap-4 sm:gap-6">
+        <div className="ml-1 flex shrink-0 items-center justify-end gap-1 sm:ml-auto sm:gap-2 lg:gap-4">
           
           {/* Share */}
           <button
             onClick={handleShare}
-            className="flex items-center gap-1.5 py-1.5 px-3 rounded-lg hover:bg-slate-100/50 text-xs sm:text-sm font-semibold text-slate-600 transition hover:text-slate-900"
+            className="flex h-9 w-9 items-center justify-center gap-1.5 rounded-lg text-xs font-semibold text-slate-600 transition hover:bg-slate-100/50 hover:text-slate-900 sm:w-auto sm:px-3 sm:text-sm"
+            aria-label={copied ? "Link copied" : "Share design"}
+            title={copied ? "Link copied" : "Share design"}
           >
             {copied ? (
               <>
                 <Check className="h-4 w-4 text-emerald-500" />
-                <span className="text-emerald-600 text-xs">Copied link!</span>
+                <span className="hidden text-xs text-emerald-600 sm:inline">Copied link!</span>
               </>
             ) : (
               <>
                 <Share2 className="h-4 w-4 text-slate-400" />
-                <span>Share</span>
+                <span className="hidden sm:inline">Share</span>
               </>
             )}
           </button>
@@ -99,33 +101,35 @@ export default function Header({ resultUrl, activeStoneName }: HeaderProps) {
           <button
             onClick={handleDownload}
             disabled={!resultUrl || downloading}
-            className={`flex items-center gap-1.5 py-1.5 px-3 rounded-lg text-xs sm:text-sm font-semibold transition ${
+            className={`relative h-9 w-9 items-center justify-center gap-1.5 rounded-lg text-xs font-semibold transition sm:flex sm:w-auto sm:px-3 sm:text-sm ${
               resultUrl
-                ? "text-sky-600 hover:text-sky-800 hover:bg-slate-100/50 cursor-pointer animate-pulse"
-                : "text-slate-300 cursor-not-allowed opacity-50"
+                ? "flex text-sky-600 hover:text-sky-800 hover:bg-slate-100/50 cursor-pointer animate-pulse"
+                : "hidden text-slate-300 cursor-not-allowed opacity-50"
             }`}
             title={resultUrl ? "Download modified room render" : "Download available only after applying design"}
+            aria-label={downloading ? "Downloading design" : "Download design"}
           >
             <Download className={`h-4 w-4 ${resultUrl ? "stroke-[2.5]" : ""}`} />
-            <span>
+            <span className="hidden sm:inline">
               {downloading ? "Downloading..." : "Download"}
             </span>
             {resultUrl && (
-              <span className="flex h-1.5 w-1.5 rounded-full bg-sky-500 animate-ping" />
+              <span className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-sky-500 animate-ping sm:static sm:flex" />
             )}
           </button>
 
           {/* Divider */}
-          <div className="h-6 w-px bg-slate-200" />
+          <div className="hidden h-6 w-px bg-slate-200 sm:block" />
 
           {/* Exit / Reset */}
           <button
             onClick={() => window.location.reload()}
-            className="flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-xs sm:text-sm font-semibold text-slate-600 transition hover:border-slate-300 hover:text-slate-950 hover:bg-slate-50"
+            className="flex h-9 w-9 items-center justify-center gap-1.5 rounded-lg border border-slate-200 text-xs font-semibold text-slate-600 transition hover:border-slate-300 hover:bg-slate-50 hover:text-slate-950 sm:w-auto sm:px-3 sm:text-sm"
             title="Reset visualizer session"
+            aria-label="Reset visualizer session"
           >
             <X className="h-3.5 w-3.5" />
-            <span>Exit</span>
+            <span className="hidden sm:inline">Exit</span>
           </button>
         </div>
       </div>
