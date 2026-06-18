@@ -56,7 +56,7 @@ export default function Header({ resultUrl, activeStoneName }: HeaderProps) {
   };
 
   return (
-    <header className="glass-header sticky top-0 z-50 h-16 w-full border-b border-slate-200">
+    <header className="glass-header sticky top-0 z-50 h-16 w-full border-b border-slate-200/60">
       <div className="flex h-full items-center justify-between px-6">
         
         {/* Left: Floor Studio Branding Logo */}
@@ -68,7 +68,7 @@ export default function Header({ resultUrl, activeStoneName }: HeaderProps) {
             <h1 className="text-sm font-bold tracking-wider text-slate-900 uppercase">
               Floor Studio
             </h1>
-            <p className="text-[10px] font-semibold text-slate-400">
+            <p className="text-[10px] font-semibold text-slate-500">
               Stone floor visualization engine
             </p>
           </div>
@@ -77,10 +77,10 @@ export default function Header({ resultUrl, activeStoneName }: HeaderProps) {
         {/* Right Actions: Share, Download, Exit */}
         <div className="flex items-center gap-4 sm:gap-6">
           
-          {/* Share
+          {/* Share */}
           <button
             onClick={handleShare}
-            className="flex items-center gap-1.5 py-1 text-xs sm:text-sm font-semibold text-slate-600 transition hover:text-slate-900"
+            className="flex items-center gap-1.5 py-1.5 px-3 rounded-lg hover:bg-slate-100/50 text-xs sm:text-sm font-semibold text-slate-600 transition hover:text-slate-900"
           >
             {copied ? (
               <>
@@ -89,20 +89,20 @@ export default function Header({ resultUrl, activeStoneName }: HeaderProps) {
               </>
             ) : (
               <>
-                <Share2 className="h-4 w-4" />
+                <Share2 className="h-4 w-4 text-slate-400" />
                 <span>Share</span>
               </>
             )}
-          </button> */}
+          </button>
 
           {/* Download (Active only when resultUrl is present) */}
           <button
             onClick={handleDownload}
             disabled={!resultUrl || downloading}
-            className={`flex items-center gap-1.5 py-1 text-xs sm:text-sm font-semibold transition ${
+            className={`flex items-center gap-1.5 py-1.5 px-3 rounded-lg text-xs sm:text-sm font-semibold transition ${
               resultUrl
-                ? "text-sky-600 hover:text-sky-800 cursor-pointer animate-pulse"
-                : "text-slate-300 cursor-not-allowed"
+                ? "text-sky-600 hover:text-sky-800 hover:bg-slate-100/50 cursor-pointer animate-pulse"
+                : "text-slate-300 cursor-not-allowed opacity-50"
             }`}
             title={resultUrl ? "Download modified room render" : "Download available only after applying design"}
           >

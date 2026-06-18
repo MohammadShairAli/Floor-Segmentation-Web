@@ -32,10 +32,10 @@ export default function PreviewStage({
   const currentImage = showOriginal ? originalImage : (resultImage || originalImage);
 
   return (
-    <div className="relative flex h-full min-h-[550px] w-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-slate-900 shadow-inner">
+    <div className="relative flex h-full min-h-[550px] w-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 shadow-inner">
       
       {currentImage ? (
-        <div className="relative flex-1 w-full h-full flex items-center justify-center  bg-slate-900/50">
+        <div className="relative flex-1 w-full h-full flex items-center justify-center bg-white/20">
           <img
             src={currentImage}
             alt="Visualization Workspace"

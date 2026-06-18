@@ -84,14 +84,13 @@ export default function Home() {
       <Header
         resultUrl={result?.result_url}
         activeStoneName={activeStone?.["name"]}
-        onRefresh={loadStones}
       />
 
       {/* VIEWPORT FILLING GRID LAYOUT */}
       <div className="flex flex-1 overflow-hidden">
         
         {/* LEFT CONTROL SIDEBAR PANEL */}
-        <aside className="w-[380px] h-full shrink-0 flex flex-col border-r border-slate-200 bg-white shadow-xs z-10">
+        <aside className="w-[380px] h-full shrink-0 flex flex-col border-r border-slate-200 bg-white/70 backdrop-blur-xl shadow-xs z-10">
           
           {/* Sidebar controls title */}
           <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
@@ -136,12 +135,12 @@ export default function Home() {
               <button
                 type="submit"
                 disabled={loading || !imageFile || !selectedStone}
-                className={`flex h-12 w-full items-center justify-center gap-2 rounded-xl font-bold text-white bg-blue-600 shadow-md transition duration-300 ${
+                className={`flex h-12 w-full items-center justify-center gap-2 rounded-xl font-bold bg-blue-700 text-white shadow-md transition duration-300 ${
                   loading
                     ? "bg-slate-700 cursor-wait opacity-80"
                     : !imageFile || !selectedStone
                     ? "bg-slate-300 text-slate-500 shadow-none cursor-not-allowed"
-                    : "bg-gradient-to-r from-sky-500 to-sky-600 hover:from-sky-600 hover:to-sky-700 hover:shadow-lg active:scale-98"
+                    : "bg-gradient-to-r from-sky-400 to-sky-500 hover:from-sky-500 hover:to-sky-600 hover:shadow-lg active:scale-98"
                 }`}
               >
                 {loading ? (

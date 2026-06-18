@@ -49,7 +49,7 @@ export default function StoneSelector({
       {/* Header with Search and Grid/List Toggles */}
       <div className="mb-4 space-y-3">
         <div className="flex items-center justify-between">
-          <h3 className="text-sm font-bold tracking-wide text-slate-800 uppercase">
+          <h3 className="text-xs font-bold tracking-wide text-slate-700 uppercase">
             Stone Designs
           </h3>
           <span className="text-xs font-semibold text-slate-400">
@@ -66,7 +66,7 @@ export default function StoneSelector({
               placeholder="Search designs..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="h-9 w-full rounded-lg border border-slate-200 bg-slate-50/50 pl-9 pr-3 text-xs outline-none transition focus:border-sky-400 focus:bg-white"
+              className="h-9 w-full rounded-lg border border-slate-200 bg-slate-50/50 pl-9 pr-3 text-xs text-slate-800 placeholder-slate-400 outline-none transition focus:border-sky-400 focus:bg-white"
             />
           </div>
 

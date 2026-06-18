@@ -55,11 +55,11 @@ export default function UploadPanel({
   return (
     <div className="glass-panel rounded-2xl p-5 transition-all duration-300 hover:shadow-md">
       <div className="mb-3 flex items-center justify-between">
-        <h3 className="text-sm font-bold tracking-wide text-slate-800 uppercase">
+        <h3 className="text-xs font-bold tracking-wide text-slate-700 uppercase">
           Room Photo
         </h3>
         {imageFile && (
-          <span className="flex items-center gap-1 text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
+          <span className="flex items-center gap-1 text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded-full">
             <Check className="h-3 w-3" /> Ready
           </span>
         )}
