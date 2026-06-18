@@ -44,7 +44,7 @@ export default function StoneSelector({
   };
 
   return (
-    <div className="glass-panel flex flex-col rounded-2xl p-5 transition-all duration-300 hover:shadow-md">
+    <div className="glass-panel flex w-full min-w-0 max-w-full flex-col overflow-hidden rounded-xl p-4 transition-all duration-300 hover:shadow-md sm:rounded-2xl sm:p-5">
       
       {/* Header with Search and Grid/List Toggles */}
       <div className="mb-4 space-y-3">
@@ -58,23 +58,23 @@ export default function StoneSelector({
         </div>
 
         {/* Search Input and Toggles */}
-        <div className="flex items-center gap-2">
-          <div className="relative flex-1">
+        <div className="flex min-w-0 items-center gap-2">
+          <div className="relative min-w-0 flex-1">
             <Search className="absolute top-2.5 left-3 h-4 w-4 text-slate-400" />
             <input
               type="text"
               placeholder="Search designs..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="h-9 w-full rounded-lg border border-slate-200 bg-slate-50/50 pl-9 pr-3 text-xs text-slate-800 placeholder-slate-400 outline-none transition focus:border-sky-400 focus:bg-white"
+              className="h-10 w-full rounded-lg border border-slate-200 bg-slate-50/50 pl-9 pr-3 text-sm text-slate-800 placeholder-slate-400 outline-none transition focus:border-sky-400 focus:bg-white sm:h-9 sm:text-xs"
             />
           </div>
 
-          <div className="flex border border-slate-200 rounded-lg p-0.5 bg-slate-50">
+          <div className="hidden shrink-0 rounded-lg border border-slate-200 bg-slate-50 p-0.5 sm:flex">
             <button
               type="button"
               onClick={() => setViewMode("grid")}
-              className={`p-1.5 rounded-md transition ${
+              className={`rounded-md p-2 transition sm:p-1.5 ${
                 viewMode === "grid"
                   ? "bg-white text-slate-900 shadow-xs border-slate-200"
                   : "text-slate-400 hover:text-slate-600"
@@ -86,7 +86,7 @@ export default function StoneSelector({
             <button
               type="button"
               onClick={() => setViewMode("list")}
-              className={`p-1.5 rounded-md transition ${
+              className={`rounded-md p-2 transition sm:p-1.5 ${
                 viewMode === "list"
                   ? "bg-white text-slate-900 shadow-xs border-slate-200"
                   : "text-slate-400 hover:text-slate-600"
@@ -100,7 +100,7 @@ export default function StoneSelector({
       </div>
 
       {/* Product Content List */}
-      <div className="flex-1 overflow-y-auto max-h-[360px] pr-1">
+      <div className="max-h-[48dvh] flex-1 overflow-y-auto pr-1 sm:max-h-[420px] lg:max-h-[360px]">
         {loading ? (
           <div className="flex flex-col items-center justify-center py-12 text-slate-400">
             <Loader2 className="h-6 w-6 animate-spin text-slate-300 mb-2" />
@@ -112,7 +112,7 @@ export default function StoneSelector({
           </div>
         ) : viewMode === "grid" ? (
           // GRID VIEW
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 lg:grid-cols-2">
             {filteredStones.map((s) => {
               const isSelected = selectedStone === s.id;
               const isFav = !!favorites[s.id];
@@ -121,14 +121,14 @@ export default function StoneSelector({
                   key={s.id}
                   type="button"
                   onClick={() => setSelectedStone(s.id)}
-                  className={`group relative flex flex-col overflow-hidden rounded-xl border text-left transition-all duration-300 ${
+                  className={`group relative flex min-w-0 flex-col overflow-hidden rounded-xl border text-left transition-all duration-300 ${
                     isSelected
                       ? "border-sky-500 bg-sky-50/20 shadow-xs ring-1 ring-sky-500"
                       : "border-slate-200 bg-white hover:border-slate-300 hover:shadow-xs"
                   }`}
                 >
                   {/* Thumbnail Image */}
-                  <div className="relative h-24 w-full overflow-hidden bg-slate-100">
+                  <div className="relative h-32 w-full overflow-hidden bg-slate-100 sm:h-28 lg:h-24">
                     <img
                       src={s.url}
                       alt={s.name}
@@ -139,13 +139,13 @@ export default function StoneSelector({
                     <button
                       type="button"
                       onClick={(e) => toggleFavorite(s.id, e)}
-                      className={`absolute top-2 right-2 rounded-full p-1 shadow-xs border transition ${
+                      className={`absolute top-2 right-2 rounded-full border p-1.5 shadow-xs transition sm:p-1 ${
                         isFav
                           ? "bg-red-500 border-red-500 text-white"
                           : "bg-white/80 border-white/90 text-slate-500 hover:text-red-500 hover:bg-white"
                       }`}
                     >
-                      <Heart className={`h-3 w-3 ${isFav ? "fill-current" : ""}`} />
+                      <Heart className={`h-3.5 w-3.5 sm:h-3 sm:w-3 ${isFav ? "fill-current" : ""}`} />
                     </button>
                   </div>
 
@@ -183,7 +183,7 @@ export default function StoneSelector({
                   key={s.id}
                   type="button"
                   onClick={() => setSelectedStone(s.id)}
-                  className={`group relative flex overflow-hidden rounded-xl border text-left transition-all duration-300 w-full ${
+                  className={`group relative flex w-full min-w-0 overflow-hidden rounded-xl border text-left transition-all duration-300 ${
                     isSelected
                       ? "border-sky-500 bg-sky-50/20 shadow-xs ring-1 ring-sky-500"
                       : "border-slate-200 bg-white hover:border-slate-300 hover:shadow-xs"
@@ -201,13 +201,13 @@ export default function StoneSelector({
                     <button
                       type="button"
                       onClick={(e) => toggleFavorite(s.id, e)}
-                      className={`absolute top-1.5 right-1.5 rounded-full p-1 shadow-xs border transition ${
+                      className={`absolute top-1.5 right-1.5 rounded-full border p-1.5 shadow-xs transition sm:p-1 ${
                         isFav
                           ? "bg-red-500 border-red-500 text-white"
                           : "bg-white/80 border-white/90 text-slate-500 hover:text-red-500 hover:bg-white"
                       }`}
                     >
-                      <Heart className={`h-2.5 w-2.5 ${isFav ? "fill-current" : ""}`} />
+                      <Heart className={`h-3 w-3 sm:h-2.5 sm:w-2.5 ${isFav ? "fill-current" : ""}`} />
                     </button>
                   </div>
 

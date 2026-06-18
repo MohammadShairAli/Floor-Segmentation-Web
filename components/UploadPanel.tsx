@@ -53,7 +53,7 @@ export default function UploadPanel({
   };
 
   return (
-    <div className="glass-panel rounded-2xl p-5 transition-all duration-300 hover:shadow-md">
+    <div className="glass-panel w-full min-w-0 max-w-full rounded-xl p-4 transition-all duration-300 hover:shadow-md sm:rounded-2xl sm:p-5">
       <div className="mb-3 flex items-center justify-between">
         <h3 className="text-xs font-bold tracking-wide text-slate-700 uppercase">
           Room Photo
@@ -80,7 +80,7 @@ export default function UploadPanel({
           onDragLeave={handleDrag}
           onDrop={handleDrop}
           onClick={onButtonClick}
-          className={`flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed p-6 text-center transition-all duration-200 ${
+          className={`flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed p-5 text-center transition-all duration-200 sm:p-6 ${
             dragActive
               ? "border-sky-500 bg-sky-50/50 scale-[0.99]"
               : "border-slate-200 bg-slate-50/50 hover:border-slate-300 hover:bg-slate-50"
@@ -101,7 +101,7 @@ export default function UploadPanel({
           <img
             src={imagePreview}
             alt="Room Preview"
-            className="h-32 w-full object-cover opacity-85 transition duration-300 group-hover:scale-105"
+            className="h-40 w-full object-cover opacity-85 transition duration-300 group-hover:scale-105 sm:h-36 lg:h-32"
           />
           <div className="absolute inset-0 flex flex-col justify-between p-3 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent">
             <div className="flex justify-end">

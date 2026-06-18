@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Sparkles, Layers, Heart, Loader2 } from "lucide-react";
+import { Sparkles, Loader2 } from "lucide-react";
 import Header from "../components/Header";
 import UploadPanel from "../components/UploadPanel";
 import StoneSelector from "../components/StoneSelector";
@@ -78,7 +78,7 @@ export default function Home() {
   }
 
   return (
-    <div className="flex h-screen w-screen flex-col overflow-hidden bg-slate-100 text-slate-700">
+    <div className="flex min-h-dvh w-full flex-col overflow-x-hidden bg-slate-100 text-slate-700 lg:h-dvh lg:overflow-hidden">
       
       {/* TOP COMPONENT HEADER BAR */}
       <Header
@@ -87,13 +87,13 @@ export default function Home() {
       />
 
       {/* VIEWPORT FILLING GRID LAYOUT */}
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex min-w-0 flex-1 flex-col lg:flex-row lg:overflow-hidden">
         
         {/* LEFT CONTROL SIDEBAR PANEL */}
-        <aside className="w-[380px] h-full shrink-0 flex flex-col border-r border-slate-200 bg-white/70 backdrop-blur-xl shadow-xs z-10">
+        <aside className="z-10 flex w-full min-w-0 max-w-full shrink-0 flex-col overflow-x-hidden border-b border-slate-200 bg-white/85 shadow-xs backdrop-blur-xl lg:h-full lg:w-[380px] lg:border-b-0 lg:border-r lg:bg-white/70">
           
           {/* Sidebar controls title */}
-          <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+          <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50/50 px-4 py-3 sm:px-5 lg:py-4">
             <h2 className="text-xs font-bold text-slate-500 uppercase tracking-widest">
               Design Controls
             </h2>
@@ -102,13 +102,13 @@ export default function Home() {
           {/* Form Scrollable Area */}
           <form
             onSubmit={handleSubmit}
-            className="flex-1 flex flex-col overflow-hidden p-5 space-y-5"
+            className="flex min-w-0 flex-col gap-4 p-4 sm:p-5 lg:flex-1 lg:overflow-hidden"
           >
-            <div className="flex-1 overflow-y-auto space-y-5 pr-1">
+            <div className="min-w-0 space-y-4 lg:flex-1 lg:overflow-y-auto lg:pr-1">
               
               {/* Error messages if any */}
               {error && (
-                <div className="rounded-xl bg-red-50 border border-red-100 p-3 text-xs text-red-600 font-medium animate-shake">
+                <div className="rounded-xl border border-red-100 bg-red-50 p-3 text-xs font-medium text-red-600 animate-shake">
                   {error}
                 </div>
               )}
@@ -131,7 +131,7 @@ export default function Home() {
             </div>
 
             {/* APPLY DESIGN CTA BUTTON */}
-            <div className="pt-4 border-t border-slate-100">
+            <div className="sticky bottom-0 -mx-4 border-t border-slate-100 bg-white/95 px-4 pb-[calc(1rem+env(safe-area-inset-bottom))] pt-3 backdrop-blur sm:-mx-5 sm:px-5 lg:static lg:mx-0 lg:bg-transparent lg:p-0 lg:pt-4">
               <button
                 type="submit"
                 disabled={loading || !imageFile || !selectedStone}
@@ -160,7 +160,7 @@ export default function Home() {
         </aside>
 
         {/* RIGHT VISUAL WORKSPACE AREA */}
-        <main className="flex-1 h-full bg-slate-900/10 p-6 overflow-hidden flex flex-col justify-center items-center">
+        <main className="flex min-h-[420px] flex-1 flex-col items-center justify-center bg-slate-900/10 p-3 sm:p-5 lg:h-full lg:min-h-0 lg:overflow-hidden lg:p-6">
           <ResultPanel
             result={result}
             loading={loading}
