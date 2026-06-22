@@ -136,7 +136,7 @@ export default function StoneSelector({
                     />
                     
                     {/* Favorite heart overlay */}
-                    <button
+                    {/* <button
                       type="button"
                       onClick={(e) => toggleFavorite(s.id, e)}
                       className={`absolute top-2 right-2 rounded-full border p-1.5 shadow-xs transition sm:p-1 ${
@@ -146,7 +146,7 @@ export default function StoneSelector({
                       }`}
                     >
                       <Heart className={`h-3.5 w-3.5 sm:h-3 sm:w-3 ${isFav ? "fill-current" : ""}`} />
-                    </button>
+                    </button> */}
                   </div>
 
                   {/* Details */}
