@@ -37,7 +37,7 @@ export default function Home() {
       setSelectedStone(data.stones?.[0]?.id || "");
     } catch (err) {
       console.error("Failed to load stones from backend api:", err);
-      setError("Unable to connect to the floor studio database.");
+      setError("Unable to connect to the Wavefront Studio database.");
     } finally {
       setLoadingStones(false);
     }
@@ -119,7 +119,18 @@ export default function Home() {
                 setImagePreview={setImagePreview}
                 imagePreview={imagePreview}
                 imageFile={imageFile}
+                onClearImage={() => setResult(null)}
               />
+
+              {/* MOBILE VISUAL WORKSPACE AREA */}
+              <div className="flex min-h-[360px] flex-col items-center justify-center bg-slate-900/10 p-3 lg:hidden">
+                <ResultPanel
+                  result={result}
+                  loading={loading}
+                  preview={imagePreview}
+                  activeStone={activeStone}
+                />
+              </div>
 
               {/* PRODUCT SELECTOR */}
               <StoneSelector
@@ -160,7 +171,7 @@ export default function Home() {
         </aside>
 
         {/* RIGHT VISUAL WORKSPACE AREA */}
-        <main className="flex min-h-[420px] flex-1 flex-col items-center justify-center bg-slate-900/10 p-3 sm:p-5 lg:h-full lg:min-h-0 lg:overflow-hidden lg:p-6">
+        <main className="hidden min-h-[420px] flex-1 flex-col items-center justify-center bg-slate-900/10 p-3 sm:p-5 lg:flex lg:h-full lg:min-h-0 lg:overflow-hidden lg:p-6">
           <ResultPanel
             result={result}
             loading={loading}

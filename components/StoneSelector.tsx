@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { Search, Grid, List, Heart, ArrowRight, Loader2 } from "lucide-react";
+import { getDisplayStoneName } from "../lib/stoneDisplay";
 
 interface Stone {
   id: string;
@@ -25,13 +26,21 @@ export default function StoneSelector({
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [favorites, setFavorites] = useState<Record<string, boolean>>({});
+  const [loadedImages, setLoadedImages] = useState<Record<string, boolean>>({});
 
   // Filter stones based on search query
   const filteredStones = useMemo(() => {
     return stones.filter(
-      (s) =>
-        s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (s.sku && s.sku.toLowerCase().includes(searchQuery.toLowerCase()))
+      (s) => {
+        const displayName = getDisplayStoneName(s.name).toLowerCase();
+        const query = searchQuery.toLowerCase();
+
+        return (
+          displayName.includes(query) ||
+          s.name.toLowerCase().includes(query) ||
+          (s.sku && s.sku.toLowerCase().includes(query))
+        );
+      }
     );
   }, [stones, searchQuery]);
 
@@ -40,6 +49,13 @@ export default function StoneSelector({
     setFavorites((prev) => ({
       ...prev,
       [id]: !prev[id],
+    }));
+  };
+
+  const markImageLoaded = (id: string) => {
+    setLoadedImages((prev) => ({
+      ...prev,
+      [id]: true,
     }));
   };
 
@@ -112,10 +128,12 @@ export default function StoneSelector({
           </div>
         ) : viewMode === "grid" ? (
           // GRID VIEW
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 lg:grid-cols-2">
+          <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3 lg:grid-cols-2">
             {filteredStones.map((s) => {
               const isSelected = selectedStone === s.id;
               const isFav = !!favorites[s.id];
+              const imageLoaded = !!loadedImages[s.id];
+              const displayName = getDisplayStoneName(s.name);
               return (
                 <button
                   key={s.id}
@@ -128,11 +146,21 @@ export default function StoneSelector({
                   }`}
                 >
                   {/* Thumbnail Image */}
-                  <div className="relative h-32 w-full overflow-hidden bg-slate-100 sm:h-28 lg:h-24">
+                  <div className="relative h-24 w-full overflow-hidden bg-slate-100 sm:h-28 lg:h-24">
+                    {!imageLoaded && (
+                      <div className="absolute inset-0 z-10 flex items-center justify-center bg-slate-100">
+                        <Loader2 className="h-5 w-5 animate-spin text-sky-400" />
+                      </div>
+                    )}
                     <img
                       src={s.url}
-                      alt={s.name}
-                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                      alt={displayName}
+                      loading="lazy"
+                      onLoad={() => markImageLoaded(s.id)}
+                      onError={() => markImageLoaded(s.id)}
+                      className={`h-full w-full object-cover transition duration-300 group-hover:scale-105 ${
+                        imageLoaded ? "opacity-100" : "opacity-0"
+                      }`}
                     />
                     
                     {/* Favorite heart overlay */}
@@ -156,10 +184,10 @@ export default function StoneSelector({
                         Premium Stone
                       </span>
                       <p className="text-xs font-bold text-slate-800 line-clamp-1">
-                        {s.name}
+                        {displayName}
                       </p>
                       <p className="mt-0.5 text-[9px] text-slate-400 truncate">
-                        SKU: {s.sku || s.name}
+                        SKU: {s.sku || displayName}
                       </p>
                     </div>
 
@@ -178,6 +206,8 @@ export default function StoneSelector({
             {filteredStones.map((s) => {
               const isSelected = selectedStone === s.id;
               const isFav = !!favorites[s.id];
+              const imageLoaded = !!loadedImages[s.id];
+              const displayName = getDisplayStoneName(s.name);
               return (
                 <button
                   key={s.id}
@@ -191,10 +221,20 @@ export default function StoneSelector({
                 >
                   {/* Thumbnail Image */}
                   <div className="relative h-20 w-24 shrink-0 overflow-hidden bg-slate-100">
+                    {!imageLoaded && (
+                      <div className="absolute inset-0 z-10 flex items-center justify-center bg-slate-100">
+                        <Loader2 className="h-4 w-4 animate-spin text-sky-400" />
+                      </div>
+                    )}
                     <img
                       src={s.url}
-                      alt={s.name}
-                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                      alt={displayName}
+                      loading="lazy"
+                      onLoad={() => markImageLoaded(s.id)}
+                      onError={() => markImageLoaded(s.id)}
+                      className={`h-full w-full object-cover transition duration-300 group-hover:scale-105 ${
+                        imageLoaded ? "opacity-100" : "opacity-0"
+                      }`}
                     />
                     
                     {/* Favorite heart overlay */}
@@ -218,10 +258,10 @@ export default function StoneSelector({
                         Premium Stone
                       </span>
                       <p className="text-xs font-bold text-slate-800 truncate">
-                        {s.name}
+                        {displayName}
                       </p>
                       <p className="text-[9px] text-slate-400 truncate mt-0.5">
-                        SKU: {s.sku || s.name}
+                        SKU: {s.sku || displayName}
                       </p>
                     </div>
 

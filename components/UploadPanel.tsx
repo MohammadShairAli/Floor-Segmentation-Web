@@ -1,11 +1,12 @@
 import { useState, useRef } from "react";
-import { UploadCloud, Image as ImageIcon, Check, RefreshCw } from "lucide-react";
+import { UploadCloud, Image as ImageIcon, RefreshCw, Trash2 } from "lucide-react";
 
 interface UploadPanelProps {
   setImageFile: (file: File | null) => void;
   setImagePreview: (url: string) => void;
   imagePreview?: string;
   imageFile?: File | null;
+  onClearImage?: () => void;
 }
 
 export default function UploadPanel({
@@ -13,6 +14,7 @@ export default function UploadPanel({
   setImagePreview,
   imagePreview,
   imageFile,
+  onClearImage,
 }: UploadPanelProps) {
   const [dragActive, setDragActive] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -52,6 +54,20 @@ export default function UploadPanel({
     inputRef.current?.click();
   };
 
+  const handleDeleteImage = () => {
+    if (imagePreview?.startsWith("blob:")) {
+      URL.revokeObjectURL(imagePreview);
+    }
+
+    setImageFile(null);
+    setImagePreview("");
+    onClearImage?.();
+
+    if (inputRef.current) {
+      inputRef.current.value = "";
+    }
+  };
+
   return (
     <div className="glass-panel w-full min-w-0 max-w-full rounded-xl p-4 transition-all duration-300 hover:shadow-md sm:rounded-2xl sm:p-5">
       <div className="mb-3 flex items-center justify-between">
@@ -59,9 +75,16 @@ export default function UploadPanel({
           Room Photo
         </h3>
         {imageFile && (
-          <span className="flex items-center gap-1 text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded-full">
-            <Check className="h-3 w-3" /> Ready
-          </span>
+          <button
+            type="button"
+            onClick={handleDeleteImage}
+            className="flex items-center gap-1 rounded-full border border-red-100 bg-red-50 px-2 py-0.5 text-[10px] font-bold text-red-600 transition hover:border-red-200 hover:bg-red-100 hover:text-red-700"
+            title="Delete uploaded photo"
+            aria-label="Delete uploaded photo"
+          >
+            <Trash2 className="h-3 w-3" />
+            Delete
+          </button>
         )}
       </div>
 
@@ -104,7 +127,7 @@ export default function UploadPanel({
             className="h-40 w-full object-cover opacity-85 transition duration-300 group-hover:scale-105 sm:h-36 lg:h-32"
           />
           <div className="absolute inset-0 flex flex-col justify-between p-3 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent">
-            <div className="flex justify-end">
+            {/* <div className="flex justify-end">
               <button
                 type="button"
                 onClick={onButtonClick}
@@ -113,7 +136,7 @@ export default function UploadPanel({
               >
                 <RefreshCw className="h-3.5 w-3.5" />
               </button>
-            </div>
+            </div> */}
             <div className="flex items-center gap-2 text-white">
               <ImageIcon className="h-4 w-4 shrink-0 text-sky-400" />
               <p className="truncate text-xs font-medium max-w-[85%]">

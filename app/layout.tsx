@@ -5,8 +5,13 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Floor Studio | Premium Stone Floor Visualizer",
+  title: "Wavefront Studio",
   description: "Visualize premium stone floor designs on your room photos in real time.",
+  icons: {
+    icon: "/Wavefront.svg",
+    shortcut: "/Wavefront.svg",
+    apple: "/Wavefront.svg",
+  },
 };
 
 export default function RootLayout({

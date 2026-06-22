@@ -1,11 +1,13 @@
 import { useState } from "react";
 import {
-  Sparkles,
   Share2,
   Download,
   X,
   Check,
 } from "lucide-react";
+import { getDisplayStoneName } from "../lib/stoneDisplay";
+
+const BRAND_LOGO_SRC = "/Wavefront.svg";
 
 interface HeaderProps {
   resultUrl?: string | null;
@@ -16,6 +18,7 @@ interface HeaderProps {
 export default function Header({ resultUrl, activeStoneName }: HeaderProps) {
   const [downloading, setDownloading] = useState(false);
   const [copied, setCopied] = useState(false);
+  const displayStoneName = getDisplayStoneName(activeStoneName);
 
   // Download logic for the modified image
   const handleDownload = async () => {
@@ -27,7 +30,7 @@ export default function Header({ resultUrl, activeStoneName }: HeaderProps) {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `floor-render-${activeStoneName?.toLowerCase().replace(/\s+/g, "-") || "design"}.png`;
+      a.download = `floor-render-${displayStoneName.toLowerCase().replace(/\s+/g, "-") || "design"}.png`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -44,8 +47,8 @@ export default function Header({ resultUrl, activeStoneName }: HeaderProps) {
   const handleShare = () => {
     if (navigator.share) {
       navigator.share({
-        title: "Floor Studio Design",
-        text: `Check out this stone floor design: ${activeStoneName || ""}`,
+        title: "Wavefront Studio design",
+        text: `Check out this stone floor design: ${displayStoneName}`,
         url: window.location.href,
       }).catch(console.error);
     } else {
@@ -59,14 +62,18 @@ export default function Header({ resultUrl, activeStoneName }: HeaderProps) {
     <header className="glass-header sticky top-0 z-50 w-screen max-w-full overflow-hidden border-b border-slate-200/60">
       <div className="flex min-h-14 w-full max-w-[100vw] items-center gap-2 px-3 py-2 sm:gap-3 sm:px-4 lg:min-h-16 lg:px-6">
         
-        {/* Left: Floor Studio Branding Logo */}
+        {/* Left: Wavefront Studio Branding Logo */}
         <div className="flex min-w-0 items-center gap-2.5 sm:gap-3">
-          <div className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-slate-900 text-white shadow-md sm:h-10 sm:w-10 sm:rounded-xl">
-            <Sparkles className="h-4 w-4 text-sky-300 sm:h-5 sm:w-5" />
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-slate-200 bg-white shadow-md sm:h-10 sm:w-10 sm:rounded-xl">
+            <img
+              src={BRAND_LOGO_SRC}
+              alt="Wavefront Studio logo"
+              className="h-full w-full object-contain p-1"
+            />
           </div>
           <div className="min-w-0">
             <h1 className="truncate text-xs font-bold tracking-wider text-slate-900 uppercase sm:text-sm">
-              Floor Studio
+              Wavefront Studio
             </h1>
             <p className="hidden text-[10px] font-semibold text-slate-500 sm:block">
               Stone floor visualization engine

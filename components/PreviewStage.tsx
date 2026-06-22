@@ -1,5 +1,8 @@
 import { useState, useEffect } from "react";
-import { Loader2, Eye, EyeOff, Sparkles, Image as ImageIcon } from "lucide-react";
+import { Loader2, Eye, EyeOff, Image as ImageIcon } from "lucide-react";
+import { getDisplayStoneName } from "../lib/stoneDisplay";
+
+const BRAND_LOGO_SRC = "/Wavefront.svg";
 
 interface PreviewStageProps {
   originalImage: string | null;
@@ -30,6 +33,7 @@ export default function PreviewStage({
 
   const hasResult = !!resultImage;
   const currentImage = showOriginal ? originalImage : (resultImage || originalImage);
+  const activeStoneDisplayName = getDisplayStoneName(activeStone?.name);
 
   return (
     <div className="relative flex h-full min-h-[360px] w-full flex-col overflow-hidden rounded-xl border border-slate-200 bg-slate-50 shadow-inner sm:min-h-[460px] lg:min-h-[550px] lg:rounded-2xl">
@@ -77,23 +81,28 @@ export default function PreviewStage({
             <div className="absolute bottom-3 left-3 right-3 flex items-center gap-3 rounded-xl border border-white/10 bg-slate-950/85 p-2.5 text-white shadow-xl backdrop-blur-md sm:bottom-4 sm:left-4 sm:right-auto sm:max-w-[80%] sm:p-3">
               <img
                 src={activeStone.url}
-                alt={activeStone.name}
+                alt={activeStoneDisplayName}
                 className="h-10 w-10 rounded-md object-cover border border-white/20"
               />
               <div className="min-w-0">
                 <span className="text-[10px] font-bold text-sky-400 uppercase tracking-wider block">
                   {hasResult && !showOriginal ? "Rendered Design" : "Selected Design"}
                 </span>
-                <p className="text-xs font-bold truncate">{activeStone.name}</p>
-                <p className="text-[9px] text-slate-400 truncate">SKU: {activeStone.sku || activeStone.name}</p>
+                <p className="text-xs font-bold truncate">{activeStoneDisplayName}</p>
+                <p className="text-[9px] text-slate-400 truncate">SKU: {activeStone.sku || activeStoneDisplayName}</p>
               </div>
             </div>
           )}
 
           {/* BRANDING BADGE */}
           <div className="absolute bottom-4 right-4 hidden items-center gap-1.5 rounded-full border border-slate-700/50 bg-slate-950/70 px-3 py-1 text-[10px] font-semibold text-slate-300 backdrop-blur-xs sm:flex">
-            <Sparkles className="h-3 w-3 text-sky-400 animate-spin-slow" />
-            <span>Powered by Floor Studio</span>
+            <img
+              src={BRAND_LOGO_SRC}
+              alt=""
+              aria-hidden="true"
+              className="h-4 w-4 rounded-full bg-white object-contain p-0.5"
+            />
+            <span>Powered by Wavefront Studio</span>
           </div>
         </div>
       ) : (
@@ -115,7 +124,12 @@ export default function PreviewStage({
           <div className="mx-4 flex max-w-[calc(100%-2rem)] flex-col items-center gap-3 rounded-2xl border border-white/10 bg-slate-900/90 p-5 text-white shadow-2xl sm:p-6">
             <div className="relative flex h-12 w-12 items-center justify-center">
               <Loader2 className="absolute h-10 w-10 animate-spin text-sky-400" />
-              <Sparkles className="h-5 w-5 text-sky-300" />
+              <img
+                src={BRAND_LOGO_SRC}
+                alt=""
+                aria-hidden="true"
+                className="h-7 w-7 rounded-full bg-white object-contain p-0.5"
+              />
             </div>
             <div className="text-center">
               <p className="text-sm font-bold">Applying Floor Design...</p>

@@ -1,4 +1,4 @@
-# Floor Studio Frontend
+# Wavefront Studio Frontend
 
 Next.js + Tailwind frontend for the Django floor replacement backend.
 
