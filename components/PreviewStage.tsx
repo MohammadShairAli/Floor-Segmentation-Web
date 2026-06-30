@@ -2,6 +2,29 @@ import { useState, useEffect } from "react";
 import { Loader2, Eye, EyeOff, Image as ImageIcon } from "lucide-react";
 import { getDisplayStoneName } from "../lib/stoneDisplay";
 
+export const DEMO_IMAGES = [
+  {
+    src: "/demo_images/image_1.jpeg",
+    fileName: "image_1.jpeg",
+    label: "Poolside",
+  },
+  {
+    src: "/demo_images/image_2.jpeg",
+    fileName: "image_2.jpeg",
+    label: "Patio",
+  },
+  {
+    src: "/demo_images/image_3.jpg",
+    fileName: "image_3.jpg",
+    label: "Walkway",
+  },
+  {
+    src: "/demo_images/image_4.jpg",
+    fileName: "image_4.jpg",
+    label: "Garden",
+  },
+] as const;
+
 const BRAND_LOGO_SRC = "/Wavefront.svg";
 
 interface PreviewStageProps {
@@ -14,6 +37,8 @@ interface PreviewStageProps {
     url: string;
     sku?: string;
   } | null;
+  onDemoSelect?: (demo: any) => void;
+  loadingDemo?: string | null;
 }
 
 export default function PreviewStage({
@@ -21,6 +46,8 @@ export default function PreviewStage({
   resultImage,
   loading,
   activeStone,
+  onDemoSelect,
+  loadingDemo,
 }: PreviewStageProps) {
   const [showOriginal, setShowOriginal] = useState(false);
 
@@ -115,6 +142,49 @@ export default function PreviewStage({
           <p className="mt-2 max-w-xs text-sm text-slate-500 sm:max-w-sm">
             Upload a room photo and choose a stone design to preview the result.
           </p>
+
+          {onDemoSelect && (
+            <div className="mt-8 w-full max-w-4xl">
+              <div className="mb-4 flex items-center justify-center gap-3">
+                <span className="h-px w-12 bg-slate-200" />
+                <span className="text-[11px] font-bold tracking-wider text-slate-400 uppercase">
+                  Or try a demo image
+                </span>
+                <span className="h-px w-12 bg-slate-200" />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
+                {DEMO_IMAGES.map((demo) => {
+                  const isLoading = loadingDemo === demo.src;
+
+                  return (
+                    <button
+                      key={demo.src}
+                      type="button"
+                      onClick={() => onDemoSelect(demo)}
+                      disabled={loadingDemo !== null || loading}
+                      aria-label={`Use ${demo.label} demo image`}
+                      className="group/demo relative aspect-[40/30] overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xs transition-all duration-300 hover:scale-105 hover:border-sky-400 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:ring-offset-2 disabled:cursor-wait disabled:opacity-70"
+                    >
+                      <img
+                        src={demo.src}
+                        alt=""
+                        className="h-full w-full object-cover transition duration-500 group-hover/demo:scale-110"
+                      />
+                      <span className="absolute inset-x-0 bottom-0 truncate bg-gradient-to-t from-slate-950/90 to-transparent px-2 pb-2 pt-6 text-center text-xs font-semibold text-white">
+                        {demo.label}
+                      </span>
+                      {isLoading && (
+                        <span className="absolute inset-0 flex items-center justify-center bg-slate-950/55 text-white">
+                          <Loader2 className="h-4 w-4 animate-spin text-sky-400" />
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
       )}
 

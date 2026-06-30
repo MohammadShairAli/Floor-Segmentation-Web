@@ -13,6 +13,8 @@ interface ResultPanelProps {
   loading: boolean;
   preview: string | null;
   activeStone?: any;
+  onDemoSelect?: (demo: any) => void;
+  loadingDemo?: string | null;
 }
 
 export default function ResultPanel({
@@ -20,6 +22,8 @@ export default function ResultPanel({
   loading,
   preview,
   activeStone,
+  onDemoSelect,
+  loadingDemo,
 }: ResultPanelProps) {
   return (
     <div className="flex h-full w-full flex-col">
@@ -29,6 +33,8 @@ export default function ResultPanel({
           resultImage={result?.result_url || null}
           loading={loading}
           activeStone={result ? result.stone : activeStone}
+          onDemoSelect={onDemoSelect}
+          loadingDemo={loadingDemo}
         />
       </div>
     </div>

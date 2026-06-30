@@ -1,34 +1,9 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
-  Check,
   Image as ImageIcon,
-  Loader2,
   Trash2,
   UploadCloud,
 } from "lucide-react";
-
-const DEMO_IMAGES = [
-  {
-    src: "/demo_images/image_1.jpeg",
-    fileName: "image_1.jpeg",
-    label: "Poolside",
-  },
-  {
-    src: "/demo_images/image_2.jpeg",
-    fileName: "image_2.jpeg",
-    label: "Patio",
-  },
-  {
-    src: "/demo_images/image_3.jpg",
-    fileName: "image_3.jpg",
-    label: "Walkway",
-  },
-  {
-    src: "/demo_images/image_4.jpg",
-    fileName: "image_4.jpg",
-    label: "Garden",
-  },
-] as const;
 
 interface UploadPanelProps {
   setImageFile: (file: File | null) => void;
@@ -46,9 +21,13 @@ export default function UploadPanel({
   onClearImage,
 }: UploadPanelProps) {
   const [dragActive, setDragActive] = useState(false);
-  const [loadingDemo, setLoadingDemo] = useState<string | null>(null);
-  const [demoError, setDemoError] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (imagePreview && inputRef.current) {
+      inputRef.current.value = "";
+    }
+  }, [imagePreview]);
 
   const selectImage = (file: File, preview: string) => {
     if (imagePreview?.startsWith("blob:")) {
@@ -57,7 +36,6 @@ export default function UploadPanel({
 
     setImageFile(file);
     setImagePreview(preview);
-    setDemoError("");
     onClearImage?.();
   };
 
@@ -90,34 +68,7 @@ export default function UploadPanel({
     }
   };
 
-  const handleDemoSelect = async (demo: (typeof DEMO_IMAGES)[number]) => {
-    setLoadingDemo(demo.src);
-    setDemoError("");
 
-    try {
-      const response = await fetch(demo.src);
-
-      if (!response.ok) {
-        throw new Error(`Unable to load ${demo.fileName}`);
-      }
-
-      const blob = await response.blob();
-      const file = new File([blob], demo.fileName, {
-        type: blob.type || "image/jpeg",
-      });
-
-      selectImage(file, demo.src);
-
-      if (inputRef.current) {
-        inputRef.current.value = "";
-      }
-    } catch (error) {
-      console.error("Failed to load demo image:", error);
-      setDemoError("Could not load that demo. Please try another image.");
-    } finally {
-      setLoadingDemo(null);
-    }
-  };
 
   const onButtonClick = () => {
     inputRef.current?.click();
@@ -215,63 +166,6 @@ export default function UploadPanel({
           </div>
         </div>
       )}
-
-      <div className="mt-4 border-t border-slate-100 pt-3">
-        <div className="mb-2 flex items-center justify-between gap-3">
-          <p className="text-[10px] font-bold tracking-wider text-slate-500 uppercase">
-            Try a demo
-          </p>
-          <span className="text-[10px] text-slate-400">Select a sample photo</span>
-        </div>
-
-        <div className="grid grid-cols-4 gap-2">
-          {DEMO_IMAGES.map((demo) => {
-            const isSelected = imagePreview === demo.src;
-            const isLoading = loadingDemo === demo.src;
-
-            return (
-              <button
-                key={demo.src}
-                type="button"
-                onClick={() => handleDemoSelect(demo)}
-                disabled={loadingDemo !== null}
-                aria-label={`Use ${demo.label} demo image`}
-                aria-pressed={isSelected}
-                className={`group/demo relative aspect-[4/3] overflow-hidden rounded-lg border bg-slate-100 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:ring-offset-2 disabled:cursor-wait disabled:opacity-70 ${
-                  isSelected
-                    ? "border-sky-500 ring-2 ring-sky-500 ring-offset-1"
-                    : "border-slate-200 hover:border-sky-400"
-                }`}
-              >
-                <img
-                  src={demo.src}
-                  alt=""
-                  className="h-full w-full object-cover transition duration-300 group-hover/demo:scale-105"
-                />
-                <span className="absolute inset-x-0 bottom-0 truncate bg-gradient-to-t from-slate-950/90 to-transparent px-1 pb-1 pt-3 text-left text-[9px] font-semibold text-white">
-                  {demo.label}
-                </span>
-                {isLoading && (
-                  <span className="absolute inset-0 flex items-center justify-center bg-slate-950/55 text-white">
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  </span>
-                )}
-                {isSelected && !isLoading && (
-                  <span className="absolute right-1 top-1 flex h-4 w-4 items-center justify-center rounded-full bg-sky-500 text-white shadow-sm">
-                    <Check className="h-3 w-3" />
-                  </span>
-                )}
-              </button>
-            );
-          })}
-        </div>
-
-        {demoError && (
-          <p className="mt-2 text-[10px] font-medium text-red-600" role="alert">
-            {demoError}
-          </p>
-        )}
-      </div>
     </div>
   );
 }

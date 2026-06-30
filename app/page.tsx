@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { Sparkles, Loader2 } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Header from "../components/Header";
 import UploadPanel from "../components/UploadPanel";
 import StoneSelector from "../components/StoneSelector";
 import ResultPanel from "../components/ResultPanel";
+import { DEMO_IMAGES } from "../components/PreviewStage";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000";
 
@@ -18,6 +18,45 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [loadingStones, setLoadingStones] = useState(true);
   const [error, setError] = useState("");
+  const [loadingDemo, setLoadingDemo] = useState<string | null>(null);
+  const latestRenderRef = useRef(0);
+
+  const clearVisualization = () => {
+    latestRenderRef.current += 1;
+    setLoading(false);
+    setResult(null);
+  };
+
+  const handleDemoSelect = async (demo: typeof DEMO_IMAGES[number]) => {
+    setLoadingDemo(demo.src);
+    setError("");
+
+    try {
+      const response = await fetch(demo.src);
+
+      if (!response.ok) {
+        throw new Error(`Unable to load ${demo.fileName}`);
+      }
+
+      const blob = await response.blob();
+      const file = new File([blob], demo.fileName, {
+        type: blob.type || "image/jpeg",
+      });
+
+      if (imagePreview?.startsWith("blob:")) {
+        URL.revokeObjectURL(imagePreview);
+      }
+
+      clearVisualization();
+      setImageFile(file);
+      setImagePreview(demo.src);
+    } catch (error) {
+      console.error("Failed to load demo image:", error);
+      setError("Could not load that demo image. Please try another one.");
+    } finally {
+      setLoadingDemo(null);
+    }
+  };
 
   const activeStone = useMemo(
     () => stones.find((s: any) => s.id === selectedStone),
@@ -44,10 +83,9 @@ export default function Home() {
   }
 
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-
-    if (!imageFile || !selectedStone) return;
+  async function applyDesign(file: File, stoneId: string) {
+    const renderId = latestRenderRef.current + 1;
+    latestRenderRef.current = renderId;
 
     setLoading(true);
     setResult(null);
@@ -55,8 +93,8 @@ export default function Home() {
 
     try {
       const form = new FormData();
-      form.append("image", imageFile);
-      form.append("stone_id", selectedStone);
+      form.append("image", file);
+      form.append("stone_id", stoneId);
 
       const res = await fetch(`${API_BASE}/api/apply/`, {
         method: "POST",
@@ -68,14 +106,28 @@ export default function Home() {
       }
 
       const data = await res.json();
-      setResult(data);
+      if (latestRenderRef.current === renderId) {
+        setResult(data);
+      }
     } catch (err: any) {
       console.error(err);
-      setError("An error occurred while rendering the floor. Please try again.");
+      if (latestRenderRef.current === renderId) {
+        setError("An error occurred while rendering the floor. Please try again.");
+      }
     } finally {
-      setLoading(false);
+      if (latestRenderRef.current === renderId) {
+        setLoading(false);
+      }
     }
   }
+
+  const handleStoneSelect = (stoneId: string) => {
+    setSelectedStone(stoneId);
+
+    if (imageFile) {
+      void applyDesign(imageFile, stoneId);
+    }
+  };
 
   return (
     <div className="flex min-h-dvh w-full flex-col overflow-x-hidden bg-slate-100 text-slate-700 lg:h-dvh lg:overflow-hidden">
@@ -100,10 +152,7 @@ export default function Home() {
           </div>
 
           {/* Form Scrollable Area */}
-          <form
-            onSubmit={handleSubmit}
-            className="flex min-w-0 flex-col gap-4 p-4 sm:p-5 lg:flex-1 lg:overflow-hidden"
-          >
+          <div className="flex min-w-0 flex-col gap-4 p-4 sm:p-5 lg:flex-1 lg:overflow-hidden">
             <div className="min-w-0 space-y-4 lg:flex-1 lg:overflow-y-auto lg:pr-1">
               
               {/* Error messages if any */}
@@ -119,7 +168,7 @@ export default function Home() {
                 setImagePreview={setImagePreview}
                 imagePreview={imagePreview}
                 imageFile={imageFile}
-                onClearImage={() => setResult(null)}
+                onClearImage={clearVisualization}
               />
 
               {/* MOBILE VISUAL WORKSPACE AREA */}
@@ -129,6 +178,8 @@ export default function Home() {
                   loading={loading}
                   preview={imagePreview}
                   activeStone={activeStone}
+                  onDemoSelect={handleDemoSelect}
+                  loadingDemo={loadingDemo}
                 />
               </div>
 
@@ -137,37 +188,10 @@ export default function Home() {
                 stones={stones}
                 loading={loadingStones}
                 selectedStone={selectedStone}
-                setSelectedStone={setSelectedStone}
+                setSelectedStone={handleStoneSelect}
               />
             </div>
-
-            {/* APPLY DESIGN CTA BUTTON */}
-            <div className="sticky bottom-0 -mx-4 border-t border-slate-100 bg-white/95 px-4 pb-[calc(1rem+env(safe-area-inset-bottom))] pt-3 backdrop-blur sm:-mx-5 sm:px-5 lg:static lg:mx-0 lg:bg-transparent lg:p-0 lg:pt-4">
-              <button
-                type="submit"
-                disabled={loading || !imageFile || !selectedStone}
-                className={`flex h-12 w-full items-center justify-center gap-2 rounded-xl font-bold bg-blue-700 text-white shadow-md transition duration-300 ${
-                  loading
-                    ? "bg-slate-700 cursor-wait opacity-80"
-                    : !imageFile || !selectedStone
-                    ? "bg-slate-300 text-slate-500 shadow-none cursor-not-allowed"
-                    : "bg-gradient-to-r from-sky-400 to-sky-500 hover:from-sky-500 hover:to-sky-600 hover:shadow-lg active:scale-98"
-                }`}
-              >
-                {loading ? (
-                  <>
-                    <Loader2 className="h-5 w-5 animate-spin" />
-                    <span>Rendering...</span>
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="h-5 w-5" />
-                    <span>Apply Design</span>
-                  </>
-                )}
-              </button>
-            </div>
-          </form>
+          </div>
         </aside>
 
         {/* RIGHT VISUAL WORKSPACE AREA */}
@@ -177,6 +201,8 @@ export default function Home() {
             loading={loading}
             preview={imagePreview}
             activeStone={activeStone}
+            onDemoSelect={handleDemoSelect}
+            loadingDemo={loadingDemo}
           />
         </main>
       </div>
