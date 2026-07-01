@@ -1,4 +1,4 @@
-// File: D:\shair_ali\Naveed\New folder\Floor-Segmentation-Web\app\layout.tsx
+// File: C:\Users\blenspar\Downloads\Floor segmentation\Floor-Segmentation-Web\app\layout.tsx
 import * as entry from '../../../app/layout.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

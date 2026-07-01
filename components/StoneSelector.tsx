@@ -60,7 +60,7 @@ export default function StoneSelector({
   };
 
   return (
-    <div className="glass-panel flex w-full min-w-0 max-w-full flex-col overflow-hidden rounded-xl p-4 transition-all duration-300 hover:shadow-md sm:rounded-2xl sm:p-5">
+    <div className="glass-panel flex w-full min-w-0 max-w-full flex-col overflow-hidden rounded-xl p-4 transition-all duration-300 hover:shadow-md sm:rounded-2xl sm:p-5 lg:min-h-0 lg:flex-1">
       
       {/* Header with Search and Grid/List Toggles */}
       <div className="mb-4 space-y-3">
@@ -116,7 +116,7 @@ export default function StoneSelector({
       </div>
 
       {/* Product Content List */}
-      <div className="max-h-[48dvh] flex-1 overflow-y-auto pr-1 sm:max-h-[420px] lg:max-h-[360px]">
+      <div className="max-h-[48dvh] flex-1 overflow-y-auto pr-1 sm:max-h-[420px] lg:min-h-0 lg:max-h-none">
         {loading ? (
           <div className="flex flex-col items-center justify-center py-12 text-slate-400">
             <Loader2 className="h-6 w-6 animate-spin text-slate-300 mb-2" />

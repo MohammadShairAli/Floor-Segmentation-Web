@@ -153,7 +153,7 @@ export default function Home() {
 
           {/* Form Scrollable Area */}
           <div className="flex min-w-0 flex-col gap-4 p-4 sm:p-5 lg:flex-1 lg:overflow-hidden">
-            <div className="min-w-0 space-y-4 lg:flex-1 lg:overflow-y-auto lg:pr-1">
+            <div className="min-w-0 space-y-4 lg:flex lg:min-h-0 lg:flex-1 lg:flex-col lg:gap-4 lg:space-y-0 lg:overflow-hidden">
               
               {/* Error messages if any */}
               {error && (
